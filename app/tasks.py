@@ -21,4 +21,18 @@ def create_task():
 
 @bp.get("/tasks")
 def list_tasks():
-    return jsonify(_store())
+    tasks = _store()
+    done = request.args.get("done")
+    if done is not None:
+        flag = done.lower() == "true"
+        tasks = [t for t in tasks if t["done"] == flag]
+    return jsonify(tasks)
+
+
+@bp.patch("/tasks/<int:task_id>/done")
+def mark_done(task_id):
+    for task in _store():
+        if task["id"] == task_id:
+            task["done"] = True
+            return jsonify(task)
+    return jsonify(error="task not found"), 404
