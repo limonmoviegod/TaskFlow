@@ -1,0 +1,28 @@
+name: CI
+on:
+  push:
+    branches: [main, develop]
+    tags: ['v*']
+  pull_request:
+permissions:
+  contents: write
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install -r requirements.txt
+      - run: pytest -q
+  release:
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: zip -r taskflow-${{ github.ref_name }}.zip app requirements.txt README.md CHANGELOG.md
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: taskflow-${{ github.ref_name }}.zip
+          generate_release_notes: true
