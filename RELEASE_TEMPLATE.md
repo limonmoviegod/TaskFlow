@@ -1,5 +1,3 @@
-# Release v{version} — {release-date}
-
 ## Нове
 - feat: Опис нової фічі.
 
